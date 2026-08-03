@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum CandidateStatus {
+  APPLIED
+  DOCUMENT_SCREENING
+  INTERVIEW
+  OFFER
+  REJECTED
+}
+
+model Job {
+  id        Int      @id @default(autoincrement())
+  title     String
+  dept      String
+  work      String
+  appeal    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articles   Article[]
+  candidates Candidate[]
+}
+
+model Article {
+  id        Int      @id @default(autoincrement())
+  title     String
+  desc      String
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  job   Job? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  jobId Int?
+}
+
+model Candidate {
+  id        Int              @id @default(autoincrement())
+  name      String
+  referrer  String
+  status    CandidateStatus  @default(APPLIED)
+  rating    Int              @default(0)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  job   Job? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  jobId Int?
+
+  statusHistory StatusHistoryEntry[]
+  comments      Comment[]
+}
+
+model StatusHistoryEntry {
+  id          Int             @id @default(autoincrement())
+  status      CandidateStatus
+  createdAt   DateTime        @default(now())
+
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  candidateId Int
+}
+
+model Comment {
+  id          Int      @id @default(autoincrement())
+  who         String
+  text        String
+  rating      Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  candidateId Int
+}

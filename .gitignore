@@ -43,9 +43,3 @@ next-env.d.ts
 
 /app/generated/prisma
 
-# sqlite db files (local dev data, not committed)
-/dev.db
-/dev.db-journal
-/prisma/*.db
-/prisma/*.db-journal
-
